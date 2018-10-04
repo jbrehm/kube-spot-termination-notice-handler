@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # How to test:
 #  NAMESPACE=default POD_NAME=kubesh-3976960141-b9b9t ./this_script
@@ -92,6 +92,14 @@ if [ "${SEMATEXT_URL}" != "" ]; then
   curl -X POST --data "{\"message\":\"$MESSAGE\",\"title\":\"Spot Termination ${CLUSTER_INFO}\",\"host\":\"${NODE_NAME}\",\"Instance\":\"${INSTANCE_ID}\", \"Availability Zone\":\"${AZ}\", \"type\":\"aws_spot_instance_terminated\"}" ${SEMATEXT_URL}
 fi
 
+# Notify Google Hangouts Chat incoming-webhook
+# Docs: https://developers.google.com/hangouts/chat/how-tos/webhooks
+#
+# You need to create (or use old) incoming webhook to send curl responses
+if [ "${GOOGLE_HANGOUTS_WEBHOOK}" != "" ]; then
+  curl -H "Content-Type: application/json" \
+    -X POST -d "{\"text\": \"${MESSAGE}\"}" ${GOOGLE_HANGOUTS_WEBHOOK}
+fi
 
 # Drain the node.
 # https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/#use-kubectl-drain-to-remove-a-node-from-service
